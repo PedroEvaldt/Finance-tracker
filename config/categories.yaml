@@ -1,0 +1,90 @@
+alimentacao:
+  - lancheria
+  - restaurante
+  - hamburger
+  - pizza
+  - sushi
+  - padaria
+  - lanche
+  - bar
+  - cafe
+  - ifood
+
+mercado:
+  - mercado
+  - feira
+  - extra
+
+transporte:
+  - uber
+  - 99
+  - taxi
+  - estacionamento
+  - pedagio
+  - onibus
+  - passagem
+
+moradia:
+  - aluguel
+  - condominio
+  - agua
+  - luz
+  - energia
+  - gas
+  - internet
+
+saude:
+  - farmacia
+  - hospital
+  - medico
+  - dentista
+  - laboratorio
+  - exame
+  - plano de saude
+  - unimed
+
+educacao:
+  - escola
+  - faculdade
+  - curso
+  - livro
+
+lazer:
+  - cinema
+  - show
+  - ingresso
+  - netflix
+  - spotify
+  - steam
+  - playstation
+  - amazon prime
+  - disney
+  - hbo
+
+assinaturas:
+  - entretenimento
+  - cursos
+
+transferencias:
+  - transferencia enviada
+  - transferencia recebida
+  - pix enviado
+  - pix recebido
+  - débito
+  - crédito
+
+receita:
+  - salario
+  - pagamento recebido
+  - transferencia recebida pelo pix
+
+investimentos:
+  - aplicacao
+  - resgate
+  - cdb
+  - tesouro
+  - fundo
+  - corretora
+  - xp
+  - rico
+  - nu invest
