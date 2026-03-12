@@ -1,0 +1,26 @@
+[project]
+name = "finance-tracker"
+version = "0.1.0"
+description = "Processamento e análise de transações financeiras da Nubank"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "pandas",
+    "pyyaml",
+    "python-dateutil",
+    "streamlit",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0.2",
+]
