@@ -13,6 +13,7 @@ def run(csv_path: str | Path) -> None:
     df = cleaning.clean(df)
     df = enrichment.enrich(df)
     df = categorization.categorize(df)
+    df = categorization.apply_overrides(df)
 
     cat_summary = analysis.summary_by_category(df)
     monthly_summary = analysis.summary_by_month(df)

@@ -7,6 +7,7 @@ import pandas as pd
 import yaml
 
 DEFAULT_CONFIG = Path(__file__).parent.parent / "config" / "categories.yaml"
+DEFAULT_OVERRIDES = Path(__file__).parent.parent / "data" / "output" / "category_overrides.csv"
 
 
 def categorize(df: pd.DataFrame, config_path: Path = DEFAULT_CONFIG) -> pd.DataFrame:
@@ -34,3 +35,19 @@ def _classify(descricao: str, rules: dict) -> tuple[str, str]:
             if re.search(str(keyword), descricao, re.IGNORECASE):
                 return categoria, "alta"
     return "outros", "baixa"
+
+
+def apply_overrides(df: pd.DataFrame, overrides_path: Path = DEFAULT_OVERRIDES) -> pd.DataFrame:
+    """Aplica correções manuais de categoria salvas pelo dashboard."""
+    if not overrides_path.exists():
+        return df
+    overrides = pd.read_csv(overrides_path)
+    if overrides.empty:
+        return df
+    df = df.copy()
+    override_map = overrides.set_index("identificador")["categoria"].to_dict()
+    mask = df["identificador"].isin(override_map)
+    df.loc[mask, "categoria"] = df.loc[mask, "identificador"].map(override_map)
+    df.loc[mask, "confianca_categoria"] = "manual"
+    df.loc[mask, "revisao_manual"] = False
+    return df

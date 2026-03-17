@@ -9,6 +9,7 @@ dependencies = [
     "pyyaml",
     "python-dateutil",
     "streamlit",
+    "plotly>=6.6.0",
 ]
 
 [project.optional-dependencies]
