@@ -8,6 +8,7 @@ from finance_tracker.analysis import (
     summary_by_establishment,
     summary_by_month,
     transactions_for_review,
+    recurring_transactions,
 )
 
 
@@ -138,3 +139,57 @@ def test_transactions_for_review_retorna_copia(df_sample):
     result = transactions_for_review(df_sample)
     result.iloc[0, result.columns.get_loc("categoria")] = "modificado"
     assert df_sample.loc[df_sample["revisao_manual"], "categoria"].iloc[0] != "modificado"
+
+
+# --- recurring_transactions ---
+
+@pytest.fixture
+def df_recorrentes() -> pd.DataFrame:
+    return pd.DataFrame([
+        # medialane: 3 meses, valor fixo R$49.90
+        {"valor": -49.90, "valor_abs": 49.90, "categoria": "assinaturas", "estabelecimento_normalizado": "medialane", "ano_mes": "2025-09", "revisao_manual": False},
+        {"valor": -49.90, "valor_abs": 49.90, "categoria": "assinaturas", "estabelecimento_normalizado": "medialane", "ano_mes": "2025-10", "revisao_manual": False},
+        {"valor": -49.90, "valor_abs": 49.90, "categoria": "assinaturas", "estabelecimento_normalizado": "medialane", "ano_mes": "2025-11", "revisao_manual": False},
+        # kampeki: 2 meses, valor variável
+        {"valor": -80.00, "valor_abs": 80.00, "categoria": "alimentacao", "estabelecimento_normalizado": "kampeki",  "ano_mes": "2025-09", "revisao_manual": False},
+        {"valor": -120.00,"valor_abs": 120.00,"categoria": "alimentacao", "estabelecimento_normalizado": "kampeki",  "ano_mes": "2025-10", "revisao_manual": False},
+        # loja unica: só 1 mês, não deve aparecer
+        {"valor": -30.00, "valor_abs": 30.00, "categoria": "outros",      "estabelecimento_normalizado": "loja x",   "ano_mes": "2025-09", "revisao_manual": False},
+        # receita: não deve aparecer (valor > 0)
+        {"valor": 1600.0, "valor_abs": 1600.0,"categoria": "receita",     "estabelecimento_normalizado": "pix",      "ano_mes": "2025-09", "revisao_manual": False},
+    ])
+
+
+def test_recurring_retorna_apenas_multiplos_meses(df_recorrentes):
+    result = recurring_transactions(df_recorrentes)
+    assert set(result["estabelecimento_normalizado"]) == {"medialane", "kampeki"}
+    assert "loja x" not in result["estabelecimento_normalizado"].values
+
+
+def test_recurring_exclui_receitas(df_recorrentes):
+    result = recurring_transactions(df_recorrentes)
+    assert "pix" not in result["estabelecimento_normalizado"].values
+
+
+def test_recurring_classifica_fixo(df_recorrentes):
+    result = recurring_transactions(df_recorrentes)
+    row = result[result["estabelecimento_normalizado"] == "medialane"].iloc[0]
+    assert row["tipo"] == "fixo"
+
+
+def test_recurring_classifica_variavel(df_recorrentes):
+    result = recurring_transactions(df_recorrentes)
+    row = result[result["estabelecimento_normalizado"] == "kampeki"].iloc[0]
+    assert row["tipo"] == "variavel"
+
+
+def test_recurring_min_months_parametro(df_recorrentes):
+    result = recurring_transactions(df_recorrentes, min_months=3)
+    assert set(result["estabelecimento_normalizado"]) == {"medialane"}
+
+
+def test_recurring_colunas_corretas(df_recorrentes):
+    result = recurring_transactions(df_recorrentes)
+    expected = {"estabelecimento_normalizado", "categoria", "meses_presentes",
+                "media_mensal", "total_meses", "coef_variacao", "tipo"}
+    assert expected.issubset(set(result.columns))

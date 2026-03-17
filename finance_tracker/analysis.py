@@ -45,3 +45,35 @@ def summary_by_establishment(df: pd.DataFrame) -> pd.DataFrame:
 def transactions_for_review(df: pd.DataFrame) -> pd.DataFrame:
     """Retorna transações marcadas para revisão manual."""
     return df[df["revisao_manual"]].copy()
+
+
+def recurring_transactions(df: pd.DataFrame, min_months: int = 2) -> pd.DataFrame:
+    """Detecta gastos recorrentes: estabelecimentos que aparecem em múltiplos meses.
+
+    Classifica cada recorrente como:
+    - fixo: coeficiente de variação <= 0.15 (valor praticamente igual todo mês)
+    - variavel: coeficiente de variação > 0.15 (frequente mas com valor oscilando)
+    """
+    total_meses = df["ano_mes"].nunique()
+    despesas = df[df["valor"] < 0].copy()
+
+    stats = despesas.groupby("estabelecimento_normalizado").agg(
+        categoria=("categoria", "first"),
+        meses_presentes=("ano_mes", "nunique"),
+        media_mensal=("valor_abs", "mean"),
+        desvio=("valor_abs", "std"),
+    ).reset_index()
+
+    stats["total_meses"] = total_meses
+    stats["coef_variacao"] = (stats["desvio"] / stats["media_mensal"]).fillna(0)
+    stats["tipo"] = stats["coef_variacao"].apply(
+        lambda cv: "fixo" if cv <= 0.15 else "variavel"
+    )
+
+    recorrentes = (
+        stats[stats["meses_presentes"] >= min_months]
+        .drop(columns="desvio")
+        .sort_values(["meses_presentes", "media_mensal"], ascending=[False, False])
+        .reset_index(drop=True)
+    )
+    return recorrentes

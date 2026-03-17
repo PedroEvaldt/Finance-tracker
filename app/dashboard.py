@@ -10,6 +10,7 @@ from finance_tracker.analysis import (
     summary_by_category,
     summary_by_establishment,
     summary_by_month,
+    recurring_transactions,
 )
 
 OUTPUT_DIR = Path(__file__).parent.parent / "data" / "output"
@@ -191,6 +192,47 @@ if not despesas.empty:
     )
     fig_dia.update_xaxes(side="bottom", dtick=1)
     st.plotly_chart(fig_dia, width="stretch")
+
+st.divider()
+
+# --- Gastos recorrentes ---
+st.header("Gastos recorrentes")
+st.caption("Estabelecimentos que aparecem em múltiplos meses. **Fixo** = valor praticamente constante. **Variável** = frequente mas com valor oscilando.")
+
+recorrentes = recurring_transactions(df_cat)
+
+if not recorrentes.empty:
+    fixos    = recorrentes[recorrentes["tipo"] == "fixo"]
+    variaveis = recorrentes[recorrentes["tipo"] == "variavel"]
+
+    col1, col2 = st.columns(2)
+
+    with col1:
+        st.subheader("Fixos (assinaturas e compromissos)")
+        if not fixos.empty:
+            total_fixo = fixos["media_mensal"].sum()
+            st.metric("Comprometido por mês", f"R$ {total_fixo:,.2f}")
+            st.dataframe(
+                fixos[["estabelecimento_normalizado", "categoria", "meses_presentes", "media_mensal"]]
+                .rename(columns={"estabelecimento_normalizado": "estabelecimento",
+                                 "meses_presentes": "meses", "media_mensal": "média/mês"}),
+                width="stretch", hide_index=True,
+            )
+        else:
+            st.info("Nenhum gasto fixo identificado.")
+
+    with col2:
+        st.subheader("Variáveis (hábitos regulares)")
+        if not variaveis.empty:
+            st.dataframe(
+                variaveis[["estabelecimento_normalizado", "categoria", "meses_presentes", "media_mensal", "coef_variacao"]]
+                .rename(columns={"estabelecimento_normalizado": "estabelecimento",
+                                 "meses_presentes": "meses", "media_mensal": "média/mês",
+                                 "coef_variacao": "variação"}),
+                width="stretch", hide_index=True,
+            )
+        else:
+            st.info("Nenhum hábito regular identificado.")
 
 st.divider()
 
