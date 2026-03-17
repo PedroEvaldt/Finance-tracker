@@ -9,6 +9,7 @@ from finance_tracker.analysis import (
     summary_by_month,
     transactions_for_review,
     recurring_transactions,
+    month_over_month,
 )
 
 
@@ -193,3 +194,46 @@ def test_recurring_colunas_corretas(df_recorrentes):
     expected = {"estabelecimento_normalizado", "categoria", "meses_presentes",
                 "media_mensal", "total_meses", "coef_variacao", "tipo"}
     assert expected.issubset(set(result.columns))
+
+
+# --- month_over_month ---
+
+@pytest.fixture
+def df_mom() -> pd.DataFrame:
+    return pd.DataFrame([
+        {"valor": -100.0, "valor_abs": 100.0, "categoria": "alimentacao", "ano_mes": "2026-01"},
+        {"valor": -50.0,  "valor_abs": 50.0,  "categoria": "mercado",     "ano_mes": "2026-01"},
+        {"valor": -150.0, "valor_abs": 150.0, "categoria": "alimentacao", "ano_mes": "2026-02"},
+        {"valor": -30.0,  "valor_abs": 30.0,  "categoria": "mercado",     "ano_mes": "2026-02"},
+        {"valor": -80.0,  "valor_abs": 80.0,  "categoria": "lazer",       "ano_mes": "2026-02"},
+        {"valor": 1000.0, "valor_abs": 1000.0,"categoria": "receita",     "ano_mes": "2026-02"},
+    ])
+
+
+def test_mom_calcula_variacao_absoluta(df_mom):
+    result = month_over_month(df_mom, "2026-02", "2026-01")
+    row = result[result["categoria"] == "alimentacao"].iloc[0]
+    assert row["variacao_abs"] == pytest.approx(50.0)
+
+
+def test_mom_calcula_variacao_percentual(df_mom):
+    result = month_over_month(df_mom, "2026-02", "2026-01")
+    row = result[result["categoria"] == "mercado"].iloc[0]
+    assert row["variacao_pct"] == pytest.approx(-40.0)
+
+
+def test_mom_categoria_nova_tem_anterior_zero(df_mom):
+    result = month_over_month(df_mom, "2026-02", "2026-01")
+    row = result[result["categoria"] == "lazer"].iloc[0]
+    assert row["anterior"] == pytest.approx(0.0)
+    assert row["atual"] == pytest.approx(80.0)
+
+
+def test_mom_exclui_receitas(df_mom):
+    result = month_over_month(df_mom, "2026-02", "2026-01")
+    assert "receita" not in result["categoria"].values
+
+
+def test_mom_colunas_corretas(df_mom):
+    result = month_over_month(df_mom, "2026-02", "2026-01")
+    assert set(result.columns) == {"categoria", "anterior", "atual", "variacao_abs", "variacao_pct"}

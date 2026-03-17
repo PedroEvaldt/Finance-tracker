@@ -11,6 +11,7 @@ from finance_tracker.analysis import (
     summary_by_establishment,
     summary_by_month,
     recurring_transactions,
+    month_over_month,
 )
 
 OUTPUT_DIR = Path(__file__).parent.parent / "data" / "output"
@@ -137,6 +138,71 @@ if not monthly.empty:
     fig.update_layout(legend_title_text="")
     st.plotly_chart(fig, width="stretch")
     st.dataframe(monthly, width="stretch", hide_index=True)
+
+st.divider()
+
+# --- Comparação mês a mês ---
+st.header("Comparação mês a mês")
+
+meses_disponiveis = sorted(df_cat["ano_mes"].unique())
+if len(meses_disponiveis) >= 2:
+    col1, col2 = st.columns(2)
+    with col1:
+        mes_atual_mom = st.selectbox(
+            "Mês atual", meses_disponiveis,
+            index=len(meses_disponiveis) - 1, key="mom_atual"
+        )
+    with col2:
+        opcoes_anterior = [m for m in meses_disponiveis if m < mes_atual_mom]
+        mes_anterior_mom = st.selectbox(
+            "Comparar com", opcoes_anterior,
+            index=len(opcoes_anterior) - 1, key="mom_anterior"
+        ) if opcoes_anterior else None
+
+    if mes_anterior_mom:
+        mom = month_over_month(df_cat, mes_atual_mom, mes_anterior_mom)
+
+        # Gráfico de barras horizontais com variação %
+        mom_valido = mom.dropna(subset=["variacao_pct"])
+        if not mom_valido.empty:
+            mom_valido = mom_valido.copy()
+            mom_valido["cor"] = mom_valido["variacao_pct"].apply(
+                lambda v: "Aumentou" if v > 0 else "Reduziu"
+            )
+            fig_mom = px.bar(
+                mom_valido.sort_values("variacao_pct"),
+                x="variacao_pct",
+                y="categoria",
+                orientation="h",
+                color="cor",
+                color_discrete_map={"Aumentou": "#e74c3c", "Reduziu": "#2ecc71"},
+                labels={"variacao_pct": "Variação (%)", "categoria": "", "cor": ""},
+                title=f"Variação por categoria: {mes_anterior_mom} → {mes_atual_mom}",
+            )
+            fig_mom.add_vline(x=0, line_dash="dash", line_color="gray")
+            fig_mom.update_layout(showlegend=True)
+            st.plotly_chart(fig_mom, width="stretch")
+
+        # Tabela detalhada
+        mom_display = mom.copy()
+        mom_display["variacao_pct"] = mom_display["variacao_pct"].map(
+            lambda v: f"{v:+.1f}%" if pd.notna(v) else "novo"
+        )
+        mom_display["variacao_abs"] = mom_display["variacao_abs"].map(
+            lambda v: f"R$ {v:+,.2f}"
+        )
+        st.dataframe(
+            mom_display.rename(columns={
+                "categoria": "Categoria",
+                "anterior": f"{mes_anterior_mom} (R$)",
+                "atual": f"{mes_atual_mom} (R$)",
+                "variacao_abs": "Variação (R$)",
+                "variacao_pct": "Variação (%)",
+            }),
+            width="stretch", hide_index=True,
+        )
+else:
+    st.info("São necessários pelo menos 2 meses de dados para comparação.")
 
 st.divider()
 

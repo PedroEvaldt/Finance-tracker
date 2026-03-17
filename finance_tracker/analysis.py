@@ -47,6 +47,38 @@ def transactions_for_review(df: pd.DataFrame) -> pd.DataFrame:
     return df[df["revisao_manual"]].copy()
 
 
+def month_over_month(df: pd.DataFrame, mes_atual: str, mes_anterior: str) -> pd.DataFrame:
+    """Compara gastos por categoria entre dois meses.
+
+    Retorna um DataFrame com: categoria, anterior (R$), atual (R$),
+    variacao_abs (R$) e variacao_pct (%).
+    Categorias ausentes num dos meses são tratadas como R$ 0.
+    """
+    despesas = df[df["valor"] < 0]
+
+    def _totais(mes: str) -> pd.Series:
+        return (
+            despesas[despesas["ano_mes"] == mes]
+            .groupby("categoria")["valor_abs"]
+            .sum()
+        )
+
+    atual    = _totais(mes_atual).rename("atual")
+    anterior = _totais(mes_anterior).rename("anterior")
+
+    result = (
+        pd.concat([anterior, atual], axis=1)
+        .fillna(0)
+        .reset_index()
+        .rename(columns={"index": "categoria"})
+    )
+    result["variacao_abs"] = result["atual"] - result["anterior"]
+    result["variacao_pct"] = (
+        result["variacao_abs"] / result["anterior"].replace(0, float("nan")) * 100
+    )
+    return result.sort_values("atual", ascending=False).reset_index(drop=True)
+
+
 def recurring_transactions(df: pd.DataFrame, min_months: int = 2) -> pd.DataFrame:
     """Detecta gastos recorrentes: estabelecimentos que aparecem em múltiplos meses.
 
