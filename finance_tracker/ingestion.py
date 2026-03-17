@@ -23,6 +23,13 @@ def load_nubank_csv(filepath: str | Path) -> pd.DataFrame:
     return df
 
 
+def load_multiple_nubank_csvs(paths: list[str | Path]) -> pd.DataFrame:
+    """Lê e concatena múltiplos CSVs da Nubank, removendo duplicatas."""
+    frames = [load_nubank_csv(p) for p in paths]
+    combined = pd.concat(frames, ignore_index=True)
+    return combined.drop_duplicates(subset="Identificador").reset_index(drop=True)
+
+
 def _validate_columns(df: pd.DataFrame, path: Path) -> None:
     missing = REQUIRED_COLUMNS - set(df.columns)
     if missing:

@@ -43,6 +43,9 @@ alimentacao:
   - liv up comercio de alimentos
   - quick
   - bella america
+  - sim uruguaiana
+  - nutri center
+  - bottega
   # Tipos de estabelecimento genéricos
   - restaurante
   - lancheria
@@ -102,7 +105,6 @@ saude:
   # Estabelecimentos identificados nos extratos
   - mfab academia
   - kinesis
-  - nutri center
   # Tipos genéricos
   - farmacia
   - drogaria
