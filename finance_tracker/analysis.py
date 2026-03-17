@@ -24,6 +24,9 @@ def summary_by_month(df: pd.DataFrame) -> pd.DataFrame:
         .reset_index()
     )
     result.columns.name = None
+    for col in ("receita", "despesa"):
+        if col not in result.columns:
+            result[col] = 0.0
     return result
 
 
