@@ -1,40 +1,112 @@
+# Regras de categorização baseadas em palavras-chave.
+# A ORDEM das categorias importa: a primeira que casar com a descrição vence.
+# Palavras-chave devem estar sem acentos e em minúsculas (a descrição é normalizada antes da busca).
+
+# Investimentos e receita ficam no topo para ter prioridade sobre "transferencias"
+investimentos:
+  - aplicacao rdb
+  - resgate rdb
+  - aplicacao
+  - resgate
+  - cdb
+  - tesouro
+  - fundo de investimento
+  - corretora
+  - nu invest
+  - xp investimentos
+  - rico investimentos
+  - rdb
+
+receita:
+  - reembolso recebido
+  - salario
+  - pagamento recebido
+
 alimentacao:
-  - lancheria
+  # Aplicativos de delivery
+  - ifood
+  - uber eats
+  - rappi
+  # Estabelecimentos identificados nos extratos
+  - kampeki
+  - bourbon ipiranga
+  - armazem do paulinho
+  - ponto campus
+  - ruta asado
+  - cafe porto farro
+  - passarinho refeicoes
+  - sabor de luna
+  - just cold
+  - dona mari
+  - kalzone
+  - elkik
+  - liv up comercio de alimentos
+  - quick
+  - bella america
+  # Tipos de estabelecimento genéricos
   - restaurante
+  - lancheria
+  - lanchonete
+  - lanche
   - hamburger
   - pizza
   - sushi
+  - temaki
+  - churrascaria
   - padaria
-  - lanche
-  - bar
+  - confeitaria
   - cafe
-  - ifood
+  - bar
+  - bistrô
+  - refeicoes
 
 mercado:
+  # Estabelecimentos identificados nos extratos
+  - supermago
+  - zaffari
+  - fruteira
+  # Redes nacionais
+  - supermercado
   - mercado
+  - hortifruti
   - feira
+  - atacadao
+  - assai
+  - carrefour
   - extra
+  - pao de acucar
+  - bistek
+  - angeloni
+  - sams club
 
 transporte:
+  # Aplicativos
   - uber
-  - 99
   - taxi
+  # Combustível / postos
+  - sim uruguaiana
+  - combustivel
+  - gasolina
+  - etanol
+  - posto
+  # Outros
   - estacionamento
   - pedagio
+  - metro
   - onibus
+  - passagem aerea
   - passagem
-
-moradia:
-  - aluguel
-  - condominio
-  - agua
-  - luz
-  - energia
-  - gas
-  - internet
+  - aeroporto
 
 saude:
+  # Estabelecimentos identificados nos extratos
+  - mfab academia
+  - kinesis
+  - nutri center
+  # Tipos genéricos
   - farmacia
+  - drogaria
+  - clinica
   - hospital
   - medico
   - dentista
@@ -42,49 +114,82 @@ saude:
   - exame
   - plano de saude
   - unimed
+  - academia
+  - ginastica
+  - fisioterapia
+  - psicologo
+  - psiquiatra
+  - otica
 
 educacao:
   - escola
   - faculdade
+  - universidade
   - curso
+  - udemy
+  - coursera
   - livro
+  - livraria
 
 lazer:
-  - cinema
-  - show
-  - ingresso
+  # Locais identificados nos extratos
+  - cantobar
+  - snooker
+  - ingresse
+  - balada bilheteria
+  - cheers
+  - liga universitaria
+  - duty free
+  # Streaming e jogos
   - netflix
   - spotify
   - steam
   - playstation
+  - xbox
   - amazon prime
   - disney
   - hbo
+  - paramount
+  - apple tv
+  - crunchyroll
+  - twitch
+  # Eventos e entretenimento
+  - cinema
+  - teatro
+  - show
+  - ingresso
+  - ticketmaster
+  - bilheteria
 
 assinaturas:
-  - entretenimento
-  - cursos
+  # Serviços identificados nos extratos
+  - medialane
+  - bytedance
+  - rl servicos de ti
+  - ecc tech
+  # Genéricos
+  - assinatura
+  - mensalidade
+  - subscription
+
+moradia:
+  - aluguel
+  - condominio
+  - agua e esgoto
+  - luz
+  - energia eletrica
+  - gas encanado
+  - internet
+  - telefone
+  - claro
+  - vivo
+  - tim
+  - oi
 
 transferencias:
   - transferencia enviada
   - transferencia recebida
   - pix enviado
   - pix recebido
-  - débito
-  - crédito
-
-receita:
-  - salario
-  - pagamento recebido
-  - transferencia recebida pelo pix
-
-investimentos:
-  - aplicacao
-  - resgate
-  - cdb
-  - tesouro
-  - fundo
-  - corretora
-  - xp
-  - rico
-  - nu invest
+  - pagamento de fatura
+  - valor adicionado para pix
