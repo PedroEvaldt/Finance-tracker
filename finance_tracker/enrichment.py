@@ -20,6 +20,7 @@ def enrich(df: pd.DataFrame) -> pd.DataFrame:
     df["mes"] = df["data"].dt.month
     df["ano_mes"] = df["data"].dt.to_period("M").astype(str)
     df["dia_semana"] = df["data"].dt.day_name()
+    df["dia_mes"] = df["data"].dt.day
     df["valor_abs"] = df["valor"].abs()
     df["tipo_movimentacao"] = df["descricao_normalizada"].apply(_detect_tipo)
     df["estabelecimento_normalizado"] = df["descricao_normalizada"].apply(

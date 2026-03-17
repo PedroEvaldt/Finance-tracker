@@ -19,6 +19,8 @@ def test_enrich_adds_date_columns():
     assert df["ano"].iloc[0] == 2026
     assert df["mes"].iloc[0] == 2
     assert df["ano_mes"].iloc[0] == "2026-02"
+    assert df["dia_semana"].iloc[0] == "Sunday"
+    assert df["dia_mes"].iloc[0] == 1
 
 
 def test_enrich_adds_valor_abs():

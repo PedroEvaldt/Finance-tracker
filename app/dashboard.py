@@ -139,6 +139,61 @@ if not monthly.empty:
 
 st.divider()
 
+# --- Heatmaps de padrões de gasto ---
+st.header("Padrões de gasto")
+
+_DAY_ORDER = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+_DAY_PT    = {"Monday": "Seg", "Tuesday": "Ter", "Wednesday": "Qua",
+              "Thursday": "Qui", "Friday": "Sex", "Saturday": "Sáb", "Sunday": "Dom"}
+
+despesas = df[df["valor"] < 0].copy()
+
+# Garante que dia_mes está disponível mesmo com CSV gerado antes da atualização do pipeline
+if "dia_mes" not in despesas.columns:
+    despesas["dia_mes"] = pd.to_datetime(despesas["data"], dayfirst=True).dt.day
+
+if not despesas.empty:
+    # Heatmap por dia da semana
+    pivot_semana = (
+        despesas.groupby(["ano_mes", "dia_semana"])["valor_abs"]
+        .sum()
+        .unstack(fill_value=0)
+        .reindex(columns=_DAY_ORDER, fill_value=0)
+    )
+    pivot_semana.columns = [_DAY_PT[d] for d in pivot_semana.columns]
+
+    fig_semana = px.imshow(
+        pivot_semana,
+        labels={"x": "Dia da semana", "y": "Mês", "color": "R$"},
+        color_continuous_scale="Reds",
+        title="Gastos por dia da semana",
+        text_auto=".0f",
+        aspect="auto",
+    )
+    fig_semana.update_xaxes(side="bottom")
+    st.plotly_chart(fig_semana, width="stretch")
+
+    # Heatmap por dia do mês
+    pivot_dia = (
+        despesas.groupby(["ano_mes", "dia_mes"])["valor_abs"]
+        .sum()
+        .unstack(fill_value=0)
+        .reindex(columns=list(range(1, 32)), fill_value=0)
+    )
+
+    fig_dia = px.imshow(
+        pivot_dia,
+        labels={"x": "Dia do mês", "y": "Mês", "color": "R$"},
+        color_continuous_scale="Reds",
+        title="Gastos por dia do mês",
+        text_auto=".0f",
+        aspect="auto",
+    )
+    fig_dia.update_xaxes(side="bottom", dtick=1)
+    st.plotly_chart(fig_dia, width="stretch")
+
+st.divider()
+
 # --- Gastos por estabelecimento ---
 st.header("Gastos por estabelecimento")
 est_summary = summary_by_establishment(df)
