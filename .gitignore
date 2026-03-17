@@ -18,3 +18,20 @@ data/output/*
 # Ambiente
 .env
 .python-version
+
+# Testes
+.pytest_cache/
+.coverage
+htmlcov/
+
+# IDEs
+.idea/
+.vscode/
+*.swp
+
+# Sistema operacional
+.DS_Store
+Thumbs.db
+
+# Claude Code
+.claude/
